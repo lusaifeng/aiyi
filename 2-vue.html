@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>2</title>
+  <style type="text/css">
+    * {
+      padding: 0;margin: 0;
+    }
+    .box {
+      width: 500px;
+      height: 500px;
+      background: #f0f0f0;
+      position: relative;
+    }
+    .box img {
+      position: absolute;
+      top:0;
+      left: 0;
+      z-index: 9;
+    }
+    .canvas {
+      height: 100%;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+    .rect {
+      z-index: 11;
+      font-size: x-small; 
+      position: absolute;
+      border: 2px red solid;
+    }
+    .content {
+      position: absolute;
+      right: -202px;
+      top: 0;
+      width: 200px;
+      height: 100px;
+      background: #fff;
+    }
+    .tool {
+      width: 100%;
+      padding: 20px 0;
+      text-align:center;
+    }
+    .tool span {
+      background: red;
+      height: 20px;
+      width: 20px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box" :style="{cursor: isClick?'crosshair':'auto'}">
+    <img src="1.jpg" width="100%" height="100%">
+    
+    <div class="canvas" id="canvas" @mousedown="canvasStart" @mousemove="canvasMove">
+      <div class="rect" :style="style" v-show="isShow">
+        <div class="content">
+          <div class="title">title</div>
+          <textarea ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <span @click="isClick = !isClick"></span>
+    </div>
+  </div>
+  <script src="http://cdn.bootcss.com/vue/2.1.10/vue.js"></script>
+  <script src="http://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    var box = new Vue({
+      el: '.box',
+      data: {
+        isClick:false,
+        x1:'',
+        y1:'',
+        x2:'',
+        y2:'',
+        shouldDraw: false,
+        isShow: false
+      },
+      methods: {
+        canvasStart: function (event) {
+          if (this.isClick) {
+            this.x1 = event.pageX
+            this.y1 = event.pageY
+            this.shouldDraw = true
+          }
+        },
+        canvasMove: function (event) {
+          if (this.isClick && this.shouldDraw) {
+            this.x2 = event.pageX
+            this.y2 = event.pageY
+            this.isShow = true
+          }
+          if(this.x2 + 4 > $('.box').width() || this.y2 + 4 > $('.box').height()){
+            this.shouldDraw = false
+          }
+        }
+      },
+      computed: {
+        style: function () {
+          return {
+            left: this.x1 + 'px',
+            top: this.y1 + 'px',
+            width: Math.abs(this.x2 - this.x1) + 'px',
+            height: Math.abs(this.y2 - this.y1) + 'px'
+          }
+        }
+      },
+      mounted: function () {
+        var that = this
+        $(document).on('mouseup',function () {
+          that.shouldDraw = false
+          that.isClick = false
+        })
+      }
+    })
+  </script>
+</body>
+</html>
